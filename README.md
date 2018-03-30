@@ -26,3 +26,9 @@ So:
 	git push fork my_new_feature
 	```
 7. then go to your fork on github and create a new pull request.
+
+
+## Style Guide
+
+1. Indent by 4 whitespaces
+2. DOCUMENT EACH FUNCTION like here: https://docs.julialang.org/en/stable/manual/documentation/
