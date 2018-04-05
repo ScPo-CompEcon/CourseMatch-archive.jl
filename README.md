@@ -9,7 +9,7 @@ This is the repo for the `CourseMatch` term project of our course.
 
 So:
 
-1. step one should be for everyone to **clone** this repo to your github account.
+1. step one should be for everyone to **fork** this repo to your github account.
 2. step two should be for everyone to `Pkg.clone` this repo into your julia package directory:
 	```julia
 	Pkg.clone("https://github.com/ScPo-CompEcon/CourseMatch.jl")
