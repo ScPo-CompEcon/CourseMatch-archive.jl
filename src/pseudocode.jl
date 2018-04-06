@@ -1,12 +1,21 @@
 #Inputs just to test loops
-    #Number of courses
-    M = 5
-    βmax = 20
-    #d(p) stupid demand function takes price vector of size M and returns demand vector size M# - Issue #4 to get the full function
-    #N(p) creates set of neighbors. WE DONT UNDERSTAND THIS - Issue #6/1
+    M = 5 #Number of courses
+    k = 3
+    βmax = 20 #Maximum budget
+    function d(p) #Demand function. To be replaced by solution to issue #4
+        10-2*p
+    end
+    function N(p,M,k) #Generates set of neighbors. Issue 6
+        #For now, this will just be a matrix of Mxk with K copies of p
+        y = Array{Float64}(M,k)
+        [y[:,i] = p for i in 1:k]
+        return y
+    end
     #t is overall time - performance
-    # l.1
-
+    
+#Testing that it works ok for now
+    p = [1,2,3,0,0] #initial guess
+    ϕϕ = N(p,M,k)
 
 #Code to fill out
 
