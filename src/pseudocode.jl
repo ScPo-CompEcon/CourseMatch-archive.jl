@@ -1,4 +1,9 @@
 #This file provides a pseudocode for algorithm one that provides the architecture for the complete algorithm. Most of the objects will change.
+#Ongoing issues
+    #1 - Creating first loop repeat until comptime expires
+    #2 - Fix DoubleN mistake line
+    #3 - My version of tau has a first column of zeros because I couldn't cat along dimension 1 if tau initially didn't have at least 1 dimension
+    #4 - Line 42 - Check that vector d is not in tau
 
 #Preliminary inputs
     M = 5 #Number of courses offered
@@ -19,12 +24,11 @@
 
 #Code to fill out
 
-#QUESTION line1: I think besterror is just supposed to be an empty array.
 besterror = Array{Float64}[]
 #repeat from l.2 to 35. This is a do until runtime > t.
     p = [1,2,3,0,0] #Initial guess for p. Will be replaced also
     searcherror =  α(d(p)) #function from issue #1
-    τ = Array{Float64}[]   #Empty. Will be filled by rejected solutions.
+    τ = zeros(M,1)  #Empty. Will be filled by rejected solutions.
     c = 0
     # while loop from l.7 to 34
     while c < 5
@@ -32,13 +36,29 @@ besterror = Array{Float64}[]
         foundnextstep = false
         # repeat from l. 10 to 16
         while foundnextstep == false | isempty(DoubleN) == true
-            ptild = DoubleN[:,2:end] #removes first row
+            ptild = DoubleN[:,2:end] #!!!!removes first column. ACTUALLY, mistake here. It's likely that we want ptild to be the first row and to progressly decrease the size of the vector.
             d = d(ptild)
             # if from l.13 to 15
-            if #d is NOT in tau. We may actually need to create a function to do this.
+            if #!!!!d is NOT in tau. We may actually need to create a function to do this.
                 foundnextstep == true
             end
         # if from line 17 to 33
+        if isempty(DoubleN) == true #This means that all the d(p) were in our Tabu list and we need to restart the loop
+            c = 5   #This will end the while and generate a new start
+        else
+            p = ptild
+            τ = cat(2,τ,d) #first row of τ will be zeros
+            currenterror = α(d)
             # if from l.23 to 28
+            if currenterror < searcherror
+                searcherror = currenterror
+                c = 0
+            else
+                c = c + 1
+            end
             # if from l.29 to 32
-    end #end of while loop line 34
+            if currenterror < besterror
+                besterror = currenterror
+                p* = p
+            end
+        end
