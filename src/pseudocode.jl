@@ -1,9 +1,9 @@
 #This file provides a pseudocode for algorithm one that provides the architecture for the complete algorithm. Most of the objects will change.
 #Ongoing issues
     #1 - Creating first loop repeat until comptime expires
-    #2 - Fix DoubleN mistake line
-    #3 - My version of tau has a first column of zeros because I couldn't cat along dimension 1 if tau initially didn't have at least 1 dimension
-    #4 - Line 42 - Check that vector d is not in tau
+    #2 - My version of tau has a first column of zeros because I couldn't cat along dimension 1 if tau initially didn't have at least 1 dimension
+    #3 - Line 42 - Check that vector d is not in tau
+    #4 - Sort Ndouble in descending order
 
 #Preliminary inputs
     M = 5 #Number of courses offered
@@ -22,8 +22,6 @@
     end
     #t is overall time - performance
 
-#Code to fill out
-
 besterror = Array{Float64}[]
 #repeat from l.2 to 35. This is a do until runtime > t.
     p = [1,2,3,0,0] #Initial guess for p. Will be replaced also
@@ -36,7 +34,8 @@ besterror = Array{Float64}[]
         foundnextstep = false
         # repeat from l. 10 to 16
         while foundnextstep == false | isempty(DoubleN) == true
-            ptild = DoubleN[:,2:end] #!!!!removes first column. ACTUALLY, mistake here. It's likely that we want ptild to be the first row and to progressly decrease the size of the vector.
+            ptild = DoubleN[:,1]
+            DoubleN = DoubleN[:,2:end]
             d = d(ptild)
             # if from l.13 to 15
             if #!!!!d is NOT in tau. We may actually need to create a function to do this.
@@ -62,3 +61,5 @@ besterror = Array{Float64}[]
                 p* = p
             end
         end
+
+#done
