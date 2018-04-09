@@ -1,6 +1,6 @@
 #This file provides a pseudocode for algorithm one that provides the architecture for the complete algorithm. Most of the objects will change.
 #Ongoing issues
-    #1 - Creating first loop repeat until comptime expires
+    #1 - Creating first loop repeat until comptime expires. Testing things at line 70. 
     #2 - My version of tau has a first column of zeros because I couldn't cat along dimension 1 if tau initially didn't have at least 1 dimension
     #3 - Line 42 - Check that vector d is not in tau
     #4 - Sort Ndouble in descending order
@@ -20,8 +20,9 @@
     function α(x) #clearing error function. To be replaced with solution to issue 1
         sum(x)
     end
-    #t is overall time - performance
+    t = 1 #t is overall time - performance. 1 is a placeholder
 
+while @elapsed < t #Would this work ? Working on a solution below.
 besterror = Array{Float64}[]
 #repeat from l.2 to 35. This is a do until runtime > t.
     p = [1,2,3,0,0] #Initial guess for p. Will be replaced also
@@ -41,6 +42,7 @@ besterror = Array{Float64}[]
             if #!!!!d is NOT in tau. We may actually need to create a function to do this.
                 foundnextstep == true
             end
+        end
         # if from line 17 to 33
         if isempty(DoubleN) == true #This means that all the d(p) were in our Tabu list and we need to restart the loop
             c = 5   #This will end the while and generate a new start
@@ -61,5 +63,16 @@ besterror = Array{Float64}[]
                 p* = p
             end
         end
-
+    end
+end
 #done
+
+#testing for time loop
+
+c=0
+rightnow = Dates.Time(now())
+t = 60
+while Dates.second((Dates.Time(now()) - rightnow)) < t
+    #Above, (Dates.Time(now()) - rightnow) is being interpreted as a Nanosecond. We need this to be interpreted as a number in seconds (or minutes, seconds to see if the loop works).
+    c = c + 1
+end
