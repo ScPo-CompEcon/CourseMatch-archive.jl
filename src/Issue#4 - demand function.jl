@@ -14,8 +14,6 @@ end
 ind_budget = rand(150:200, 20)
 price = rand(Float32, 10)
 
-a=1
-
 # Initialize demand
 
 Demand = []
@@ -44,7 +42,7 @@ for i in 1:20
 		# Constraints:
 
 		#Should have exactly 3 classes
-		@constraint(m, sum(x) <= capacity)
+		@constraint(m, sum(x) == capacity)
 
 		#Should not spend more than one's budget
 		@constraint(m,  dot(price, x) <= budget)
@@ -69,8 +67,6 @@ Total_demand = sum(Demand)
 #= In that case the objective becomes quadratic. It seems that the CBC
 solver cannot handle quadratic objectives, so I switched to gurob, which can. =#
 
-using Gurobi
-
 A = sparse([1; 1; 2; 2; 2; 3; 4], [1; 4; 2; 3; 4; 3; 4], [80, 200, 50, -200, -200, 30, 75])
 
 demand = []
@@ -91,7 +87,7 @@ let
 	# Constraints:
 
 	#Should have exactly 3 classes
-	@constraint(m, sum(x) <= capacity)
+	@constraint(m, sum(x) == capacity)
 
 	#Should not spend more than one's budget
 	@constraint(m,  dot(price, x) <= budget)
