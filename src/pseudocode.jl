@@ -9,11 +9,14 @@
     function d(p) #Demand function. To be replaced by solution to issue #4. For now a stupid downward sloping demand function.
         10-2*p
     end
-    function N(p,M,k) #Generates set of neighbors. To be replaced by solution to issue #6. For now, this will just be a matrix of MxK with K copies of p
-        y = Array{Float64}(M,k)
-        [y[:,i] = p for i in 1:k]
+    function N(p) #Generates set of neighbors. To be replaced by solution to issue #6. For now, this will just be a matrix of MxK with K copies of p
+        y = Array[]
+        for i in 1:3
+            push!(y,p)
+        end
         return y
     end
+
     function α(x) #clearing error function. To be replaced with solution to issue 1
         sum(x)
     end
@@ -24,16 +27,16 @@ besterror = Array{Float64}[]
 #repeat from l.2 to 35. This is a do until runtime > t.
     p = [1,2,3,0,0] #Initial guess for p. Will be replaced also
     searcherror =  α(d(p)) #function from issue #1
-    τ = Array()  #Empty. Will be filled by rejected solutions.
+    τ = Array[]  #Empty. Will be filled by rejected solutions.
     c = 0
     # while loop from l.7 to 34
     while c < 5
-        DoubleN = α(N(p),1) #Function that evaluates clearing error of neighbors and sorting in descending order. Another issue I'm not sure is in our list
+        DoubleN = N(p) #Don't forget this needs to be sorted by clearing error (Issue #6)
         foundnextstep = false
         # repeat from l. 10 to 16
         while foundnextstep == false | isempty(DoubleN) == true
-            ptild = DoubleN[:,1]
-            DoubleN = DoubleN[:,2:end]
+            ptild = DoubleN[1]
+            DoubleN = DoubleN[2:end]
             d = d(ptild)
             # if from l.13 to 15
             if !(d in τ)
