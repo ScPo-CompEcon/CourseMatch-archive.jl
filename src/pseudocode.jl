@@ -1,6 +1,7 @@
 #This file provides a pseudocode for algorithm one that provides the architecture for the complete algorithm. Most of the objects will change.
 #Ongoing issues
     #1 - Sort Ndouble in descending order
+    #Not returning besterror
 
 #Preliminary inputs
     M = 5 #Number of courses offered
@@ -21,9 +22,8 @@
         sum(x)
     end
     starttime = Dates.Time(now())
-
+besterror = 10
 while (Dates.Time(now()) - starttime).value < t *1000000000
-besterror = Array{Float64}[]
 #repeat from l.2 to 35. This is a do until runtime > t.
     p = [1,2,3,0,0] #Initial guess for p. Will be replaced also
     searcherror =  α(d(p)) #function from issue #1
@@ -34,12 +34,13 @@ besterror = Array{Float64}[]
         DoubleN = N(p) #Don't forget this needs to be sorted by clearing error (Issue #6)
         foundnextstep = false
         # repeat from l. 10 to 16
+        dem = zeros(M)
         while foundnextstep == false | isempty(DoubleN) == true
             ptild = DoubleN[1]
             DoubleN = DoubleN[2:end]
-            d = d(ptild)
+            dem[:] = d(ptild)
             # if from l.13 to 15
-            if !(d in τ)
+            if !(dem in τ)
                 foundnextstep == true
             end
         end
@@ -48,8 +49,8 @@ besterror = Array{Float64}[]
             c = 5   #This will end the while and generate a new start
         else
             p = ptild
-            push!(τ,d)
-            currenterror = α(d)
+            push!(τ,dem)
+            currenterror = α(dem)
             # if from l.23 to 28
             if currenterror < searcherror
                 searcherror = currenterror
