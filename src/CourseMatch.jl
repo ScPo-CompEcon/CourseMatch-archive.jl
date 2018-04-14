@@ -2,7 +2,11 @@ module CourseMatch
 
 	VERSION = VersionNumber(0,0,0)
 
-# package code goes here
+using JuMP, Cbc, Gurobi
+
+
+# Demand function
+include("Issue#4-demandfunc.jl")
 
 
 
