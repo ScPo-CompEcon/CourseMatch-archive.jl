@@ -1,6 +1,7 @@
 #This file provides a pseudocode for algorithm one that provides the architecture for the complete algorithm. Most of the objects will change.
 #Ongoing issues
     #1 - Sort Ndouble in descending order
+    #2 - The last neighbord won't be tested the way the algorithm is designed right now
     #Not returning besterror
 
 #Preliminary inputs
@@ -21,19 +22,34 @@
     function α(x) #clearing error function. To be replaced with solution to issue 1
         sum(x)
     end
-    starttime = Dates.Time(now())
+
+
+t = 1
+starttime = Dates.Time(now())
 besterror = 10
+#Defining variables
+p = Array[]
+pstar = Array[]
+searcherror = Array[]
+DoubleN = Array[]
+foundnextstep = Array[]
+dem = zeros(M)
+currenterror = Array[]
+τ = Array[]  #Empty. Will be filled by rejected solutions.
+Np = [[1,2,3,0,0] [0,0,0,0,0] [1,1,1,1,1]]
+
 while (Dates.Time(now()) - starttime).value < t *1000000000
 #repeat from l.2 to 35. This is a do until runtime > t.
     p = [1,2,3,0,0] #Initial guess for p. Will be replaced also
     searcherror =  α(d(p)) #function from issue #1
-    τ = Array[]  #Empty. Will be filled by rejected solutions.
     c = 0
     # while loop from l.7 to 34
     while c < 5
-        DoubleN = N(p) #Don't forget this needs to be sorted by clearing error (Issue #6)
+        DoubleN = Np
+        #DoubleN = N(p) #Don't forget this needs to be sorted by clearing error (Issue #6)
         foundnextstep = false
         # repeat from l. 10 to 16
+        ptild = Array[]
         dem = zeros(M)
         while foundnextstep == false | isempty(DoubleN) == true
             ptild = DoubleN[1]
@@ -50,8 +66,13 @@ while (Dates.Time(now()) - starttime).value < t *1000000000
         else
             p = ptild
             push!(τ,dem)
+            if p == [0,0,0,0,0]
+                currenterror = -1000000
+
+            else
             currenterror = α(dem)
             # if from l.23 to 28
+            end
             if currenterror < searcherror
                 searcherror = currenterror
                 c = 0
@@ -65,5 +86,6 @@ while (Dates.Time(now()) - starttime).value < t *1000000000
             end
         end
     end
+    print(pstar)
 end
 #done
