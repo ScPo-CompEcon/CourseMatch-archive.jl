@@ -23,12 +23,26 @@
         sum(x)
     end
 
+    #
+    function while2()
+        global ptild = DoubleN[1]
+        global foundnextstep = true
+        global DoubleN = DoubleN[2:end]
+        global dem = d(ptild)
+        # if from l.13 to 15
+        if !(dem in τ)
+            foundnextstep == true
+        end
+    end
+
+
 
 t = 1
 starttime = Dates.Time(now())
 besterror = 10
 #Defining variables
 p = Array[]
+ptild = Array[]
 pstar = Array[]
 searcherror = Array[]
 DoubleN = Array[]
@@ -37,52 +51,67 @@ dem = zeros(M)
 currenterror = Array[]
 τ = Array[]  #Empty. Will be filled by rejected solutions.
 Np = [[1,2,3,0,0] [0,0,0,0,0] [1,1,1,1,1]]
-
-while (Dates.Time(now()) - starttime).value < t *1000000000
+c = 0
+h =0
+#while (Dates.Time(now()) - starttime).value < t *1000000000
 #repeat from l.2 to 35. This is a do until runtime > t.
-    p = [1,2,3,0,0] #Initial guess for p. Will be replaced also
-    searcherror =  α(d(p)) #function from issue #1
-    c = 0
+    global p = [1,2,3,0,0] #Initial guess for p. Will be replaced also
+    global searcherror =  α(d(p)) #function from issue #1
+    global c = 0
     # while loop from l.7 to 34
     while c < 5
-        DoubleN = Np
+        global DoubleN = Np
         #DoubleN = N(p) #Don't forget this needs to be sorted by clearing error (Issue #6)
-        foundnextstep = false
+        global foundnextstep = false
         # repeat from l. 10 to 16
-        ptild = Array[]
         dem = zeros(M)
+        global c = c+1
+        h = 0
+        while h < 5
+            while2()
+        end
+    end
+end
+
+
         while foundnextstep == false | isempty(DoubleN) == true
-            ptild = DoubleN[1]
-            DoubleN = DoubleN[2:end]
+            global ptild = DoubleN[1]
+            global foundnextstep = true
+        end
+    end
+end
+
+
+            global DoubleN = DoubleN[2:end]
             dem[:] = d(ptild)
             # if from l.13 to 15
             if !(dem in τ)
-                foundnextstep == true
+                global foundnextstep == true
             end
         end
         # if from line 17 to 33
         if isempty(DoubleN) == true #This means that all the d(p) were in our Tabu list and we need to restart the loop
-            c = 5   #This will end the while and generate a new start
+            global c = 5   #This will end the while and generate a new start
         else
-            p = ptild
+            global p = ptild
             push!(τ,dem)
             if p == [0,0,0,0,0]
-                currenterror = -1000000
+                global currenterror = -1000000
 
             else
-            currenterror = α(dem)
+            global currenterror = α(dem)
             # if from l.23 to 28
             end
             if currenterror < searcherror
-                searcherror = currenterror
-                c = 0
+                global searcherror = currenterror
+                global c = 0
             else
-                c = c + 1
+                global c = c + 1
             end
             # if from l.29 to 32
             if currenterror < besterror
-                besterror = currenterror
-                pstar = p
+                global besterror = currenterror
+                global pstar = p
             end
         end
     end
