@@ -20,7 +20,7 @@ function demand(price, pref, budget, capacity)
 
 	for i in 1:M
 
-		N = size(Ind_pref[i])[1]
+		N = size(pref[i])[1]
 
 		let
 			# Maximization problem
@@ -51,32 +51,34 @@ function demand(price, pref, budget, capacity)
 
 end
 
+export(demand)
+
 
 ######
 
 ## Example : 20 individuals, 10 classes to choose from, exactly 3 classes to attend, NO CROSS PREFERENCES
 
 # Individual preferences are generated as an array of sparse diagonal matrices
-
-Ind_pref = []
-for i in 1:20
-	push!(Ind_pref, sparse(collect(1:10), collect(1:10), rand(0:100, 10)))
-end
-
-# Individual budget
-
-ind_budget = rand(150:200, 20)
-
-# Price vector
-
-price = rand(Float32, 10)
-
-# Capacity vector
-
-cap = fill(3, 20)
-
-# Function application
-
-demand(price, Ind_pref, ind_budget, cap)
+#
+# Ind_pref = []
+# for i in 1:20
+# 	push!(Ind_pref, sparse(collect(1:10), collect(1:10), rand(0:100, 10)))
+# end
+#
+# # Individual budget
+#
+# ind_budget = rand(150:200, 20)
+#
+# # Price vector
+#
+# price = rand(Float32, 10)
+#
+# # Capacity vector
+#
+# cap = fill(3, 20)
+#
+# # Function application
+#
+# demand(price, Ind_pref, ind_budget, cap)
 
 ######
