@@ -39,7 +39,7 @@
         end
     end
 
-    #replacebesterror will check that the currenterror is less than the best error that from ALL search starts. If it is, then that currenterror becomes the best error and the associated price vector is the new best price. 
+    #replacebesterror will check that the currenterror is less than the best error that from ALL search starts. If it is, then that currenterror becomes the best error and the associated price vector is the new best price.
     function replacebesterror()
         if currenterror[1] < besterror[1]
             global besterror = currenterror

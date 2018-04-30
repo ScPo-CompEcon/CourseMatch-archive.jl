@@ -6,6 +6,9 @@ include("PseudoNeighbor.jl")
 include("loops.jl")
 
 #Defining variables for future
+M = 5 #Number of courses offered
+k = 3 #Number of courses students take
+βmax = 20 #Maximum budget
 p = Array[] #searchstart
 ptild = Array[] #new search price
 pstar = Array[] #price that gives best error
@@ -17,9 +20,6 @@ currenterror = Array[] #error in the current search.
 τ = Array[]  #Tabu list will be filled by rejected solutions.
 
 #Preliminary inputs
-M = 5 #Number of courses offered
-k = 3 #Number of courses students take
-βmax = 20 #Maximum budget
 t = 0.005 #time in seconds
 besterror = 100 #for now
 Np = Array[[0,0,0,0,0], [1,1,1,1,1], [1,2,3,0,0]] #test neighbors
@@ -53,7 +53,7 @@ function coursematch()
             end
         end
     end
-    println(pstar)
+    println("Best price vector is $pstar")
 end
 
 coursematch()
