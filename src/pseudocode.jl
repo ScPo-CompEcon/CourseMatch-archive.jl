@@ -1,41 +1,28 @@
-#This file provides a pseudocode for algorithm one that provides the architecture for the complete algorithm. Most of the objects will change.
-#Ongoing issues
-    #1 - Sort Ndouble in descending order
-    #2 - The last neighbord won't be tested the way the algorithm is designed right now
-    #Not returning besterror
-
+#This file provides a pseudocode for algorithm one that provides the architecture for the complete algorithm. Some of these objects can change.
 
 include("PseudoDemand.jl")
 include("PseudoClearingError.jl")
 include("PseudoNeighbor.jl")
 include("loops.jl")
 
+#Defining variables for future
+p = Array[] #searchstart
+ptild = Array[] #new search price
+pstar = Array[] #price that gives best error
+searcherror = Array[] #best error in a searchstart
+DoubleN = Array[] #neighbors of the search
+foundnextstep = Array[] #boolean. true if a new search price has been found (one that does not generate the same demand as one that is in the tabu list)
+dem = zeros(M) #the demand for courses at search price
+currenterror = Array[] #error in the current search.
+τ = Array[]  #Tabu list will be filled by rejected solutions.
 
 #Preliminary inputs
 M = 5 #Number of courses offered
 k = 3 #Number of courses students take
 βmax = 20 #Maximum budget
-t = 0.005
-
-besterror = 100
-#Defining variables for future
-p = Array[]
-ptild = Array[]
-pstar = Array[]
-searcherror = Array[]
-DoubleN = Array[]
-foundnextstep = Array[]
-dem = zeros(M)
-currenterror = Array[]
-τ = Array[]  #Empty. Will be filled by rejected solutions.
-# p = Array[[1,2,3,0,0]]
-# #τ = d(p)
-# push!(τ,d(p))
-# p = Array[[0,0,0,0,0]]
-# push!(τ,d(p))
-# p = Array[[1,1,1,1,1]]
-# push!(τ,d(p))
-Np = Array[[0,0,0,0,0], [1,1,1,1,1], [1,2,3,0,0]]
+t = 0.005 #time in seconds
+besterror = 100 #for now
+Np = Array[[0,0,0,0,0], [1,1,1,1,1], [1,2,3,0,0]] #test neighbors
 
 function coursematch()
     starttime = Dates.Time(now())
