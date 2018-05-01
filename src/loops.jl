@@ -1,16 +1,20 @@
     # Findingnextstep does the following : 1. It isolates the first neighbor (N1) of the neighbor list, removes N1 from neighbor list (such that N becomes N-1), checks the demand of N1, and checks if that demand is in the tabu list.
-    function findingnextstep()
-        global ptild = Array[DoubleN[1]]
-        global DoubleN = DoubleN[2:end]
-        global dem = d(ptild)
+    function findingnextstep(DoubleN, τ)
+        ptild = Array[DoubleN[1]]
+        DoubleN = DoubleN[2:end]
+        dem = d(ptild)
         #if from l.13 to 15
-        checktabu()
+        foundnextstep = checktabu(dem, τ)
+        Dict = Dict("ptild" => ptild, "DoubleN" => DoubleN, "dem" => dem, "foundnextstep" => foundnextstep)
+        return(Dict)
     end
 
     #checktabu verifies if we've already checked a price vector that yields D(N1) demand for courses. If we have not, then we've found the price vector to check.
-    function checktabu() #if from l.13 to 15
+    function checktabu(dem, τ) #if from l.13 to 15
         if (dem in τ) == false #If dem is not in the tabu list
-            global foundnextstep = true
+            return(true)
+        else
+            return(false)
         end
     end
 

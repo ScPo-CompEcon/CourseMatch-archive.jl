@@ -39,7 +39,8 @@ function coursematch()
             # repeat from l. 10 to 16
             global dem = zeros(M)
             while foundnextstep == false | isempty(DoubleN) == false
-                findingnextstep()
+                findingnextstep = findingnextstep(DoubleN, τ)
+                ptild, DoubleN, dem, foundnexstep = findingnextstep["ptild"], findingnextstep["DoubleN"], findingnextstep["dem"], findingnextstep["foundnextstep"]
             end
             # if from line 17 to 33
             if isempty(DoubleN) == true
