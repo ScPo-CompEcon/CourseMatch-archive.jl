@@ -1,12 +1,12 @@
     # Findingnextstep does the following : 1. It isolates the first neighbor (N1) of the neighbor list, removes N1 from neighbor list (such that N becomes N-1), checks the demand of N1, and checks if that demand is in the tabu list.
     function findingnextstep(DoubleN, τ)
         ptild = Array[DoubleN[1]]
-        DoubleN = DoubleN[2:end]
+        deleteat!(DoubleN, 1)
         dem = d(ptild)
         #if from l.13 to 15
         foundnextstep = checktabu(dem, τ)
-        Dict = Dict("ptild" => ptild, "DoubleN" => DoubleN, "dem" => dem, "foundnextstep" => foundnextstep)
-        return(Dict)
+        Dico = Dict("ptild" => ptild, "DoubleN" => DoubleN, "dem" => dem, "foundnextstep" => foundnextstep)
+        return(Dico)
     end
 
     #checktabu verifies if we've already checked a price vector that yields D(N1) demand for courses. If we have not, then we've found the price vector to check.
@@ -39,5 +39,19 @@
         if currenterror[1] < besterror[1]
             global besterror = currenterror
             global pstar = p
+        end
+    end
+
+
+    #=The function finds the next relevant price vector among the neighbors. Basically, it takes each price vector in the list of neighbors
+    and looks if the demand generated is in the tabu list. If so, it goes to the next neighor, otherwise, it has found the new price vector!
+    Its value is pushed into ptild, tried price vectors are removed from DoubleN, dem is the demand associated with this new price vector and
+    foundnextstep is changed to true if it has found a new price vector, while the tabu list is left unchanged.
+    =#
+    function findnextprices!(ptild, DoubleN, dem, foundnextstep, τ)
+        while foundnextstep[1] == false | isempty(DoubleN) == false
+            Dico = findingnextstep(DoubleN, τ)
+            ptild[:], dem[:], foundnextstep[1] = Dico["ptild"][1], Dico["dem"][1],  Dico["foundnextstep"]
+            #println(foundnextstep, ptild) #ptild = good
         end
     end
