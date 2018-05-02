@@ -12,8 +12,10 @@
     #checktabu verifies if we've already checked a price vector that yields D(N1) demand for courses. If we have not, then we've found the price vector to check.
     function checktabu(dem, τ) #if from l.13 to 15
         if (dem in τ) == false #If dem is not in the tabu list
+            #println("Found next step")
             return(true)
         else
+            #println("No next step")
             return(false)
         end
     end
@@ -21,6 +23,7 @@
     #newsetup generates a new search using the price vector N1 if it was not in the tabu list. This also involes adding d(N1) to the tabu list.
     function newsetup()
         global p = ptild
+        println(p)
         push!(τ,dem)
     end
 
@@ -28,9 +31,13 @@
     function replacesearcherror()
         if currenterror[1] < searcherror[1]
             global searcherror = currenterror
+            println("New searcherror = $searcherror")
             global c = 0
+            println(c)
         else
             global c = c + 1
+            println("No new searcherror")
+            println(c)
         end
     end
 
