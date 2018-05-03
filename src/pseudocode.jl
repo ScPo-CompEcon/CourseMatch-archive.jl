@@ -1,15 +1,14 @@
 #This file provides a pseudocode for algorithm one that provides the architecture for the complete algorithm. Some of these objects can change.
 
-#include("PseudoDemand.jl")
+include("PseudoDemand.jl")
 include("PseudoClearingError.jl")
 include("PseudoNeighbor.jl")
 include("loops.jl")
 
 #Preliminary variables
- #test neighbors
+#test neighbors
 
 function coursematch(M, k, βmax, besterror, t, Np)
-
     ptild = Array{Int}(M) #new search price
     pstar = Array[] #price that gives best error
     searcherror = Array[] #best error in a searchstart
@@ -30,37 +29,24 @@ function coursematch(M, k, βmax, besterror, t, Np)
             #DoubleN = N(p) #Don't forget this needs to be sorted by clearing error (Issue #6)
             foundnextstep[1] = false
             # repeat from l. 10 to 16
-            #dem = zeros(M)
-            println("l.34 $τ") #not a problem
-            findnextprices!(ptild,  DoubleN, dem, foundnextstep, τ) #definitely here
-            println("l. 36 $τ") #
-            #println(ptild)
-            #println(foundnextstep)
-            #println(τ) #empty - not good
-            # if from line 17 to 33
-            #push!(τ,dem)
-            #println(τ)
+            findnextprices!(ptild,  DoubleN, dem, foundnextstep, τ)
+            # if from line 17 to 18
             if isempty(DoubleN) == true
-                #println("Making it to l. 45")
                 c = 5
             end
-            #println("l 50 $τ")
+            #l. 19 to 33
             if foundnextstep[1] == true
-                #println("Making it to l. 50")
-                newsetupa = newp(ptild)
-                #println("l.54 $dem")
-                push!(τ,copy(dem)) #This needs to be a copy, otherwise you just get a huge array of identical demand vectors
-                #τ[:] = newsetupa["τ"] #This line is not the problem. The problem arises in the push
-                p = newsetupa["p"]
-                currenterror =  α.(dem)
-                replacesearcherror(currenterror, searcherror, c)
-                replacebesterror(currenterror, besterror, p)
+                push!(τ,copy(dem))
+                p = copy(ptild)
+                currenterror =  α(dem)
+                c = resetcounter(currenterror, searcherror, c)
+                searcherror = replacesearcherror(currenterror, searcherror)
+                pstar = replacepstar(currenterror, besterror, p, pstar)
+                besterror = replacebesterror(currenterror, besterror)
             end
-            #println("l.60 $τ")
         end
-
     end
-    println("Best price vector is $pstar")
+    return pstar
 end
 
 M = 5 #Number of courses offered
@@ -69,13 +55,4 @@ k = 3 #Number of courses students take
 t = 0.005 #time in seconds
 besterror = 100 #for now
 Np = Array[[0,0,0,0,0], [1,1,1,1,1], [1,2,3,0,0]]
-coursematch(M, k, βmax, besterror, t, Np)
-
-# T = Array[]
-# T1 = [0,0,0,0,0]
-# push!(T,T1)
-# T2 = [1,1,1,1,1]
-# push!(T,T2)
-# T3 = [1,2,3,0,0]
-# push!(T,T3)
-# println(T)
+pstar = coursematch(M, k, βmax, besterror, t, Np)

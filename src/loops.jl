@@ -32,31 +32,37 @@
         end
     end
 
-    #newsetup generates a new search using the price vector N1 if it was not in the tabu list. This also involes adding d(N1) to the tabu list.
-    function newp(ptild)
-        p = ptild
-        Dico = Dict("p" => p)
-        return Dico
+    #replacesearcherror will check is the current error is less than the best error in the search start (searcherror). If it is, then currenterror becomes the new searcherror. Since we've improved on our searcherror, the step counter starts again. If we haven't imroved on our search error, the step counter increases by 1.
+    function replacesearcherror(currenterror, searcherror)
+        if currenterror[1] < searcherror[1]
+            return currenterror
+            #println("New searcherror = $searcherror")
+        else
+            return searcherror
+        end
     end
 
-    #replacesearcherror will check is the current error is less than the best error in the search start (searcherror). If it is, then currenterror becomes the new searcherror. Since we've improved on our searcherror, the step counter starts again. If we haven't imroved on our search error, the step counter increases by 1.
-    function replacesearcherror(currenterror, searcherror, c)
+    function resetcounter(currenterror, searcherror, c)
         if currenterror[1] < searcherror[1]
-            searcherror = currenterror
-            #println("New searcherror = $searcherror")
-            c = 0
-            #println(c)
+            return 0
         else
-            c = c + 1
-            #println("No new searcherror")
-            #println(c)
+            return c + 1
         end
     end
 
     #replacebesterror will check that the currenterror is less than the best error that from ALL search starts. If it is, then that currenterror becomes the best error and the associated price vector is the new best price.
-    function replacebesterror(currenterror, besterror, p)
+    function replacebesterror(currenterror, besterror)
         if currenterror[1] < besterror[1]
-            besterror[1] = currenterror[1]
-            pstar[1] = p
+            return currenterror
+        else
+            return besterror
+        end
+    end
+
+    function replacepstar(currenterror, besterror, p, pstar)
+        if currenterror[1] < besterror[1]
+            return p
+        else
+            return pstar
         end
     end
