@@ -14,7 +14,7 @@ The argument to the *demand* function defined above should be such that :
 
 	-> *time_const* is an sparse array C x C that flags with 1 if the ith element HAS a clash with jth element. 0 otherwise.
 
-	-> *mand__cour_const* is a vector C x 1. the i-th element is 1 if the course must be taken, 0 otherwise
+	-> *mand_cour_const* is a vector C x 1. the i-th element is 1 if the course must be taken, 0 otherwise
 
 	-> *prog_cour_const* is a vector C x 1. the i-th element is 1 if the course is NOT in the students's program. 0 otherwise.
 
@@ -26,7 +26,7 @@ The argument to the *demand* function defined above should be such that :
 
 	=#
 
-function demand(price, pref, budget, capacity, time_const, mand_const, prog_cour_const, sem_cour_const, elec_cour_const, num_elec_cour)
+function demand(price, pref, budget, capacity, time_const, mand_cour_const, prog_cour_const, sem_cour_const, elec_cour_const, num_elec_cour)
 
 	dem = []
 
@@ -56,13 +56,13 @@ function demand(price, pref, budget, capacity, time_const, mand_const, prog_cour
 		@constraint(m, mand_cour_const'*x == 0 )
 
 		#Elective courses
-		@constraint(m, elec_cour_const'*x - num_elec_cour >= 0)
+		@constraint(m, elec_cour_const'*x .- num_elec_cour .>= 0)
 
 		#Program courses
-		@constraint(m, prog_cour_const'*x == 0 )
+		@constraint(m, prog_cour_const'*x .== 0 )
 
 		#Program courses
-		@constraint(m, sem_cour_const'*x == 0 )
+		@constraint(m, sem_cour_const'*x .== 0 )
 
 		# Solve problem using MIP solver
 		status = solve(m)
@@ -76,50 +76,60 @@ end
 
 ######
 
-M = 20
+num_stud = 20
+num_cour = 15
+mkt_demand = []
 
-for i in 1:M
+for i in 1:num_stud
 
 	# Individual preferences are generated as an array of sparse diagonal matrices
-	Ind_pref = sparse(collect(1:10), collect(1:10), rand(0:100, 10))
+	Ind_pref = sparse(collect(1:num_cour), collect(1:num_cour), rand(-100:100, num_cour))
 
 	# Individual budget
-	ind_budget = rand(150:200)
+	ind_budget = 150+rand()
 
 	# Price vector
-	price = rand(Float32, 10)
+	price = 100*rand(Float32, size(Ind_pref,1))
 
 	# Capacity vector
-	cap = rand(3:5)
-
-	#Schedule collisions
-	time_const = zeros(10,10)
+	cap = rand(2:4)
 
 	#Mandatory courses
-	mand_cour_const = rand(0:1,10)
+	mand_cour_const = rand(Binomial(1,0.2), size(Ind_pref,1))
+
+	#Flag non Mandatory courses
+	non_mand = findn(mand_cour_const .== 0)
+
+	#Schedule collisions
+	time_const = zeros(size(Ind_pref,1), size(Ind_pref,1))
+	time_const[non_mand[1],non_mand[2]] = time_const[non_mand[2],non_mand[1]] = 1
+	time_const[non_mand[3],non_mand[4]] = time_const[non_mand[4],non_mand[3]] = 1
 
 	#Program courses
-	prog_cour_const = 1 - mand_const
+	prog_cour_const = zeros(size(Ind_pref,1),1)
+	prog_cour_const[non_mand[5]] = 1
+	prog_cour_const[non_mand[6]] = 1
 
 	#Semester courses
-	sem_cour_const = prog_cour_const
+	sem_cour_const = zeros(size(Ind_pref,1),1)
+	sem_cour_const[non_mand[7]] = 1
+	sem_cour_const[non_mand[8]] = 1
 
 	#Elective courses
-	elec_cour_const = ones(10,1)
+	elec_cour_const = zeros(size(Ind_pref,1),1)
+	elec_cour_const[non_mand[9]] = 1
+	elec_cour_const[non_mand[10]] = 1
 
 	#Number of elective courses
-	num_elec_cour = 1
+	num_elec_cour = 2
 
 	#Demand computation
-	dem = demand(price, Ind_pref, ind_budget, cap, time_const, mand_const, prog_cour_const, sem_cour_const, elec_cour_const, num_elec_cour)
+	dem = demand(price, Ind_pref, ind_budget, cap, time_const, mand_cour_const, prog_cour_const, sem_cour_const, elec_cour_const, num_elec_cour)
 
-	mkt_demand = []
 	push!(mkt_demand, dem)
 	return mkt_demand
 end
 
 mkt_demand = Dict("ind_demands" => ans, "total_demand" => sum(ans) )
-
-
 
 ######
