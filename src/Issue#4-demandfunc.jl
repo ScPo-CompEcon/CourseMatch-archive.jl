@@ -14,13 +14,19 @@ The argument to the *demand* function defined above should be such that :
 
 	-> *time_const* is an sparse array C x C that flags with 1 if the ith element HAS a clash with jth element. 0 otherwise.
 
-	-> *mand_const* is a vector C x 1. the i-th element is 1 if the course must be taken, 0 otherwise
+	-> *mand__cour_const* is a vector C x 1. the i-th element is 1 if the course must be taken, 0 otherwise
 
 	-> *prog_cour_const* is a vector C x 1. the i-th element is 1 if the course is NOT in the students's program. 0 otherwise.
 
-	-> *sem_cour_const* is a vector C x 1. the i-th element is 1 if the course is NOT the students's semester =#
+	-> *sem_cour_const* is a vector C x 1. the i-th element is 1 if the course is NOT the students's semester
 
-function demand(price, pref, budget, capacity, time_const, mand_const, prog_cour_const, sem_cour_const)
+	-> *elec_cour_const* is a vector C x 1. the i-th element is 1 if the course is elective for the students
+
+	-> *num_elec_cour* is the number of elective courses that the student is required to take
+
+	=#
+
+function demand(price, pref, budget, capacity, time_const, mand_const, prog_cour_const, sem_cour_const, elec_cour_const, num_elec_cour)
 
 	dem = []
 
@@ -47,7 +53,10 @@ function demand(price, pref, budget, capacity, time_const, mand_const, prog_cour
 		@constraint(m, x'*time_const*x == 0 )
 
 		#Mandatory courses
-		@constraint(m, mand_const'*x == sum(mand_const) )
+		@constraint(m, mand_cour_const'*x == 0 )
+
+		#Elective courses
+		@constraint(m, elec_cour_const'*x - num_elec_cour >= 0)
 
 		#Program courses
 		@constraint(m, prog_cour_const'*x == 0 )
@@ -87,7 +96,7 @@ for i in 1:M
 	time_const = zeros(10,10)
 
 	#Mandatory courses
-	mand_const = rand(0:1,10)
+	mand_cour_const = rand(0:1,10)
 
 	#Program courses
 	prog_cour_const = 1 - mand_const
@@ -95,8 +104,14 @@ for i in 1:M
 	#Semester courses
 	sem_cour_const = prog_cour_const
 
+	#Elective courses
+	elec_cour_const = ones(10,1)
+
+	#Number of elective courses
+	num_elec_cour = 1
+
 	#Demand computation
-	dem = demand(price, Ind_pref, ind_budget, cap, time_const, mand_const, prog_cour_const, sem_cour_const)
+	dem = demand(price, Ind_pref, ind_budget, cap, time_const, mand_const, prog_cour_const, sem_cour_const, elec_cour_const, num_elec_cour)
 
 	mkt_demand = []
 	push!(mkt_demand, dem)
