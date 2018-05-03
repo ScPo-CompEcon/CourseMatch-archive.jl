@@ -1,17 +1,88 @@
-#= Demand function =#
+"""
+    demand(price, pref, budget, capacity)
+
+Compute the total demand for classes based on the optimal individual bundles given preferences,
+ budget and prices, thanks to GurobiSolver.
 
 
-#= Assume that N is the number of students, and C the number of classes that are available to choose from.
+# Arguments
 
-The argument to the *demand* function defined above should be such that :
-	-> *price* is a column vector of dimension C x 1, which i-th element is the price that was assigned to class i.
+Assume that N is the number of students, and C the number of classes that are available to choose from.
 
-	-> *pref* is an array containing S elements, and such that its n-th element is the (sparse) matrix representing student n preferences. Each of the matrices contained in that array should be a squared matrix of dimension C.
+- `price` : a column vector of dimension C x 1, which i-th element is the price that was assigned to class i.
 
-	-> *budget* is a column vector of dimension N x 1, which n-th element is the budget that was allocated to the n-th student.
+- `pref` : an array containing S elements, and such that its n-th element is the (sparse) matrix representing student n preferences.
+	Each of the matrices contained in that array should be a squared matrix of dimension C.
 
-	-> *capacity* is a column vector of dimension N x 1, which n-th element is the number of classes student n has to attend. =#
+- `budget` : a column vector of dimension N x 1, which n-th element is the budget that was allocated to the n-th student.
 
+- `capacity` : a column vector of dimension N x 1, which n-th element is the number of classes student n has to attend.
+
+# Example
+
+20 individuals, 10 classes to choose from, exactly 3 classes to attend, NO CROSS PREFERENCES
+(Individual preferences are generated as an array of sparse diagonal matrices
+
+```
+julia> Ind_pref = []
+0-element Array{Any,1}
+
+julia> for i in 1:20
+               push!(Ind_pref, sparse(collect(1:10), collect(1:10), rand(0:100, 10)))
+       end
+
+julia> Ind_pref
+20-element Array{Any,1}:
+
+  [1 ,  1]  =  63
+  [2 ,  2]  =  51
+  [3 ,  3]  =  39
+  [4 ,  4]  =  85
+  [5 ,  5]  =  35
+  [6 ,  6]  =  60
+  [7 ,  7]  =  84
+  [8 ,  8]  =  96
+  [9 ,  9]  =  61
+  [10, 10]  =  56
+
+  ⋮
+
+  [1 ,  1]  =  30
+  [2 ,  2]  =  9
+  [3 ,  3]  =  9
+  [4 ,  4]  =  58
+  [5 ,  5]  =  25
+  [6 ,  6]  =  82
+  [7 ,  7]  =  0
+  [8 ,  8]  =  75
+  [9 ,  9]  =  94
+  [10, 10]  =  36
+
+julia> ind_budget = rand(150:200, 20)
+20-element Array{Int64,1}:
+  162
+  195
+  ⋮
+  193
+
+julia> price = rand(Float32, 10)
+10-element Array{Float32,1}:
+  0.786705
+  0.735436
+  ⋮
+  0.880273
+
+julia> cap = fill(3, 20)
+20-element Array{Int64,1}:
+  3
+  ⋮
+  3
+
+julia> demand(price, Ind_pref, ind_budget, cap)
+```
+
+"""
+...
 function demand(price, pref, budget, capacity)
 
 	demand = []
@@ -20,7 +91,7 @@ function demand(price, pref, budget, capacity)
 
 	for i in 1:M
 
-		N = size(Ind_pref[i])[1]
+		N = size(pref[i])[1]
 
 		let
 			# Maximization problem
@@ -50,33 +121,3 @@ function demand(price, pref, budget, capacity)
 					"total_demand" => sum(demand) )
 
 end
-
-
-######
-
-## Example : 20 individuals, 10 classes to choose from, exactly 3 classes to attend, NO CROSS PREFERENCES
-
-# Individual preferences are generated as an array of sparse diagonal matrices
-
-Ind_pref = []
-for i in 1:20
-	push!(Ind_pref, sparse(collect(1:10), collect(1:10), rand(0:100, 10)))
-end
-
-# Individual budget
-
-ind_budget = rand(150:200, 20)
-
-# Price vector
-
-price = rand(Float32, 10)
-
-# Capacity vector
-
-cap = fill(3, 20)
-
-# Function application
-
-demand(price, Ind_pref, ind_budget, cap)
-
-######
