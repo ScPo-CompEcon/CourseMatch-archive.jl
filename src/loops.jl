@@ -25,9 +25,10 @@
     function checktabu(dem, τ) #if from l.13 to 15
         if (dem in τ) == false #If dem is not in the tabu list
             #println("Found next step")
+            #println("Found next step")
             return(true)
         else
-            #println("No next step")
+            #println("No new next step")
             return(false)
         end
     end

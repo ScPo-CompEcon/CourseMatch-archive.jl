@@ -21,7 +21,7 @@ function coursematch(M, k, βmax, besterror, t, Np)
     while (Dates.Time(now()) - starttime).value < t *1000000000
     #repeat from l.2 to 35. This is a do until runtime > t.
         p = Array[[0,0,0,0,0]] #Initial guess for p. Will be replaced also
-        searcherror =  α.(d(p)) ##= 50 function from issue #1
+        searcherror =  α.(d(p)) ##= 50 function from issue #1. For this person, will need to make sure it returns the absolute value
         c = 0
         # while loop from l.7 to 34
         while c < 5
@@ -44,15 +44,20 @@ function coursematch(M, k, βmax, besterror, t, Np)
                 pstar = replacepstar(currenterror, besterror, p, pstar)
                 besterror = replacebesterror(currenterror, besterror)
             end
+            println("we are at step $c")
+            println("The best price is $pstar")
         end
+        println(τ)
     end
-    return pstar
+    println("Best price is $pstar")
+    #return pstar
 end
 
 M = 5 #Number of courses offered
 k = 3 #Number of courses students take
 βmax = 20 #Maximum budget
-t = 0.005 #time in seconds
+t = 0.01 #time in seconds
 besterror = 100 #for now
-Np = Array[[0,0,0,0,0], [1,1,1,1,1], [1,2,3,0,0]]
+Np = Array[[0,0,0,0,0],[9,40,5,2,0], [1,1,1,1,1], [1,2,3,0,0], [9,40,5,2,0], [32,40,100,1,2], [10,20,30,3,0]]
+coursematch(M, k, βmax, besterror, t, Np)
 pstar = coursematch(M, k, βmax, besterror, t, Np)
