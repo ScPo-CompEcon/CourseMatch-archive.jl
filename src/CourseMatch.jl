@@ -1,15 +1,13 @@
 module CourseMatch
 
-	VERSION = VersionNumber(0,0,0)
+	VERSION = VersionNumber(0,0,1)
 
 using JuMP, Cbc, Gurobi, CSV, DataFrames
 
 
-#API : reading student data
-
 # Demand function
-include("Issue#4-demandfunc.jl")
-include("API.jl")
+include("demand.jl")
+include("student.jl")
 
 
 
