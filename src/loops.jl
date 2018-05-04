@@ -14,6 +14,7 @@
     function findingnextstep(DoubleN, τ)
         ptild = Array[DoubleN[1]]
         deleteat!(DoubleN, 1)
+        #println(DoubleN)
         dem = d(ptild)
         #if from l.13 to 15
         foundnextstep = checktabu(dem, τ)
@@ -23,12 +24,11 @@
 
     #checktabu verifies if we've already checked a price vector that yields D(N1) demand for courses. If we have not, then we've found the price vector to check.
     function checktabu(dem, τ) #if from l.13 to 15
-        if (dem in τ) == false #If dem is not in the tabu list
-            #println("Found next step")
-            #println("Found next step")
+        if (dem[1] in τ) == false #If dem is not in the tabu list
+            println("Found next step")
             return(true)
         else
-            #println("No new next step")
+            println("No new next step")
             return(false)
         end
     end

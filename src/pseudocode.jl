@@ -5,9 +5,6 @@ include("PseudoClearingError.jl")
 include("PseudoNeighbor.jl")
 include("loops.jl")
 
-#Preliminary variables
-#test neighbors
-
 function coursematch(M, k, βmax, besterror, t, Np)
     ptild = Array{Int}(M) #new search price
     pstar = Array[] #price that gives best error
@@ -25,7 +22,7 @@ function coursematch(M, k, βmax, besterror, t, Np)
         c = 0
         # while loop from l.7 to 34
         while c < 5
-            DoubleN = Np
+            DoubleN = copy(Np)
             #DoubleN = N(p) #Don't forget this needs to be sorted by clearing error (Issue #6)
             foundnextstep[1] = false
             # repeat from l. 10 to 16
@@ -45,19 +42,15 @@ function coursematch(M, k, βmax, besterror, t, Np)
                 besterror = replacebesterror(currenterror, besterror)
             end
             println("we are at step $c")
-            println("The best price is $pstar")
         end
-        println(τ)
     end
-    println("Best price is $pstar")
-    #return pstar
+    return pstar
 end
 
 M = 5 #Number of courses offered
 k = 3 #Number of courses students take
 βmax = 20 #Maximum budget
-t = 0.01 #time in seconds
+t = 1 #time in seconds
 besterror = 100 #for now
 Np = Array[[0,0,0,0,0],[9,40,5,2,0], [1,1,1,1,1], [1,2,3,0,0], [9,40,5,2,0], [32,40,100,1,2], [10,20,30,3,0]]
-coursematch(M, k, βmax, besterror, t, Np)
 pstar = coursematch(M, k, βmax, besterror, t, Np)
