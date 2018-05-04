@@ -114,10 +114,9 @@ julia> d[:ind_demands]
 """
 function demand(price, pref, budget, capacity)
 
-	demand = []
 
 	M = length(pref)
-    N = size(pref[1])[1]  # imposed that all have the same number of preferences.
+    N = size(pref[1],2)  # imposed that all have the same number of preferences.
     demand = zeros(Int,M,N)
 
 	for i in 1:M
