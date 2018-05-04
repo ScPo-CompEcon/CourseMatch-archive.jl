@@ -5,9 +5,11 @@ module CourseMatch
 using JuMP, Cbc, Gurobi, CSV, DataFrames
 
 
-# Demand function
+# includes
 include("demand.jl")
 include("student.jl")
+
+# exports
 
 
 
