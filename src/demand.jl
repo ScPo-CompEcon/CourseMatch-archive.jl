@@ -1,5 +1,6 @@
 """
     demand(price, pref, budget, capacity)
+    demand(price, s::Student)
 
 Compute the total demand for classes based on the optimal individual bundles given preferences, budget and prices, using the `GurobiSolver()`.
 
@@ -145,6 +146,11 @@ function demand(price, pref, budget, capacity)
 
 	end
 
-	return Dict(:ind_demands => demand,:course_demand => sum(demand,1),:total=>sum(demand) )
+  # add clearing error
+  # err = clearing_error(sum(demand,1),chairs,price)
+
+
+  return Dict(:ind_demands => demand,:course_demand => sum(demand,1),:total=>sum(demand) )
+	# return Dict(:ind_demands => demand,:course_demand => sum(demand,1),:total=>sum(demand),:clearing_error=>err )
 
 end

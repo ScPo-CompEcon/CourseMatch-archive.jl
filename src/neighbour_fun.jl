@@ -23,6 +23,12 @@ function neighb_fun(price::Vector, demand, clear_error, pref, budget, capacity, 
         indiv_neighb = [indiv_adjust(k, price, demand, clear_error, pref, budget, capacity) for k in index]
     end
 
+    # now get demand for all
+    # neighbour_vect = [grad_neighb ; indiv_neighb]
+    # D =d(neighbour_vect)
+    # err =clearning_error(D[:course_demand])
+    # return (neighbour_vect, D, err)
+
     return neighbour_vect = [grad_neighb ; indiv_neighb]
 end
 

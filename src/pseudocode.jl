@@ -22,7 +22,7 @@ function coursematch(M, k, βmax, besterror, t, Np)
         c = 0
         # while loop from l.7 to 34
         while c < 5
-            DoubleN = copy(Np)
+            DoubleN = copy(Np)  # going to be neighb_fun
             #DoubleN = N(p) #Don't forget this needs to be sorted by clearing error (Issue #6)
             foundnextstep[1] = false
             # repeat from l. 10 to 16

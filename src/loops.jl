@@ -15,7 +15,7 @@
         ptild = Array[DoubleN[1]]
         deleteat!(DoubleN, 1)
         #println(DoubleN)
-        dem = d(ptild)
+        dem = D(ptild)
         #if from l.13 to 15
         foundnextstep = checktabu(dem, τ)
         Dico = Dict("ptild" => ptild, "DoubleN" => DoubleN, "dem" => dem, "foundnextstep" => foundnextstep)
