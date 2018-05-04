@@ -1,5 +1,7 @@
 # CourseMatch
 
+[![Build Status](https://travis-ci.org/ScPo-CompEcon/CourseMatch.jl.svg?branch=master)](https://travis-ci.org/ScPo-CompEcon/CourseMatch.jl)
+
 This is the repo for the `CourseMatch` term project of our course.
 
 ## Modus Operandi
