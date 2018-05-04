@@ -1,9 +1,10 @@
 #Clearing Error Function
-function  z(x::Matrix{Int64}, q::Vector{Int64}, p::Vector{Int64}, N::Int64)
+function  z(x::Matrix{Int64}, q::Vector{Int64}, p::Vector{Int64})
    # S is the number of students, N is the number of courses
    # x is the SxN allocation matrix
    # q is the Nx1 course capacity vector
    # p is the Nx1 price vector
+   N = length(q)
    zer = zeros(N)        #Create empty Nx1 vector of clearing errors
    numstud = transpose(sum(x, 1)) #Create Nx1 vector with the number of students enrolled in each course.
    for i in 1:N        #For every course

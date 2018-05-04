@@ -1,6 +1,6 @@
 # CourseMatch
 
-[![Build Status](https://travis-ci.org/ScPo-CompEcon/CourseMatch.jl.svg?branch=master)](https://travis-ci.org/ScPo-CompEcon/CourseMatch.jl)
+[![Build status](https://badge.buildkite.com/c42d85291bb037838c362342e2216d25b7886fb105623cbd2a.svg)](https://buildkite.com/sciencespoecon/coursematch)
 
 This is the repo for the `CourseMatch` term project of our course.
 

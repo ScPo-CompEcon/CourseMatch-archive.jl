@@ -71,7 +71,7 @@ end
 
 
 """
-    read_student()
+    read_students()
 
 Construct `Student`s from artificial time sheet data.
 
