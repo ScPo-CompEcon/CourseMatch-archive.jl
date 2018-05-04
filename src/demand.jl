@@ -1,81 +1,38 @@
-#= Demand function =#
+"""
+    demand(price::Vector, Student::Student, p_neigh_parm::Int64)
+
+Compute the total demand for classes based on the optimal individual bundles given preferences, budget and prices, and under constraints such as program, semester and time clashes using the `GurobiSolver()`.
 
 
-#= Assume that N is the number of students, and C the number of classes that are available to choose from.
+## Arguments
 
-The argument to the *demand* function defined above should be such that :
-	-> *price* is a column vector of dimension C x 1, which i-th element is the price that was assigned to class i.
+Assume that N is the number of students, and C the number of classes that are available to choose from.
 
-	-> *pref* is an array containing S elements, and such that its n-th element is the (sparse) matrix representing student n preferences. Each of the matrices contained in that array should be a squared matrix of dimension C.
+- `price` : a column vector of dimension C x 1, which i-th element is the price that was assigned to class i.
+- `Student.pref` : an array containing S elements, and such that its n-th element is the (sparse) matrix representing student n preferences. Each of the matrices contained in that array should be a squared matrix of dimension C.
+- `Student.budget` : a column vector of dimension N x 1, which n-th element is the budget that was allocated to the n-th student.
+- `Student.capacity` : a column vector of dimension N x 1, which n-th element is the number of classes student n has to attend.
+- `Student.time_const` : a sparse array C x C that flags with 1 if the ith element HAS a clash with jth element. 0 otherwise.
+- `Student.mand_cour_const` : a vector C x 1. the i-th element is 1 if the course must be taken, 0 otherwise
+- `Student.prog_cour_const` : a vector C x 1. the i-th element is 1 if the course is NOT in the students's program. 0 otherwise.
+- `Student.sem_cour_const` : a vector C x 1. the i-th element is 1 if the course is NOT the students's semester
+- `Student.elec_cour_const` : a vector C x 1. the i-th element is 1 if the course is elective for the students
+- `Student.num_elec_cour` : number of elective courses that the student is required to take
+- `p_neigh_parm` : course that needs to be dropped in order to compute neigboring prices
 
-	-> *budget* is a column vector of dimension N x 1, which n-th element is the budget that was allocated to the n-th student.
+## Example
 
-	-> *capacity* is a column vector of dimension N x 1, which n-th element is the number of classes student n has to attend.
+* 20 individuals
+* 15 classes to choose from
+* Random classes to attend between 4 and 6
+* Random number of mandatory classes to attend with an average of 2 per student
+* Two random time collisions per student in non?mandatory courses
+* Two random courses that are not allowed to be taken by the program of the student
+* Two random courses that are not allowed to be taken by the semester of the student
+* Two random courses are electives for each student, they are required to take 1
+* NO CROSS PREFERENCES, i.e. Individual preferences are generated as an array of sparse diagonal matrices
 
-	-> *time_const* is an sparse array C x C that flags with 1 if the ith element HAS a clash with jth element. 0 otherwise.
-
-	-> *mand_cour_const* is a vector C x 1. the i-th element is 1 if the course must be taken, 0 otherwise
-
-	-> *prog_cour_const* is a vector C x 1. the i-th element is 1 if the course is NOT in the students's program. 0 otherwise.
-
-	-> *sem_cour_const* is a vector C x 1. the i-th element is 1 if the course is NOT the students's semester
-
-	-> *elec_cour_const* is a vector C x 1. the i-th element is 1 if the course is elective for the students
-
-	-> *num_elec_cour* is the number of elective courses that the student is required to take
-
-	=#
-
-function demand(price, pref, budget, capacity, time_const, mand_cour_const, prog_cour_const, sem_cour_const, elec_cour_const, num_elec_cour)
-
-	dem = []
-
-	N = size(pref)[1]
-
-	let
-		# Maximization problem
-		m = Model(solver=GurobiSolver())
-
-		@variable(m, x[1:N], Bin)
-
-		# Objective: maximize utility
-		@objective(m, Max, x'*pref*x)
-
-		# Constraints:
-
-		#Should have exactly 3 classes
-		@constraint(m, sum(x) == capacity)
-
-		#Should not spend more than one's budget
-		@constraint(m,  dot(price, x) <= budget )
-
-		#Time Constraints
-		@constraint(m, x'*time_const*x == 0 )
-
-		#Mandatory courses
-		@constraint(m, mand_cour_const'*x == 0 )
-
-		#Elective courses
-		@constraint(m, elec_cour_const'*x .- num_elec_cour .>= 0)
-
-		#Program courses
-		@constraint(m, prog_cour_const'*x .== 0 )
-
-		#Program courses
-		@constraint(m, sem_cour_const'*x .== 0 )
-
-		# Solve problem using MIP solver
-		status = solve(m)
-		dem = getvalue(x)
-		return dem
-
-	end
-
-end
-
-
-######
-
+```
 num_stud = 20
 num_cour = 15
 mkt_demand = []
@@ -92,10 +49,10 @@ for i in 1:num_stud
 	price = 100*rand(Float32, size(Ind_pref,1))
 
 	# Capacity vector
-	cap = rand(2:4)
+	cap = rand(4:6)
 
 	#Mandatory courses
-	mand_cour_const = rand(Binomial(1,0.2), size(Ind_pref,1))
+	mand_cour_const = rand(Binomial(1,0.13), size(Ind_pref,1))
 
 	#Flag non Mandatory courses
 	non_mand = findn(mand_cour_const .== 0)
@@ -121,7 +78,7 @@ for i in 1:num_stud
 	elec_cour_const[non_mand[10]] = 1
 
 	#Number of elective courses
-	num_elec_cour = 2
+	num_elec_cour = 1
 
 	#Demand computation
 	dem = demand(price, Ind_pref, ind_budget, cap, time_const, mand_cour_const, prog_cour_const, sem_cour_const, elec_cour_const, num_elec_cour)
@@ -132,4 +89,57 @@ end
 
 mkt_demand = Dict("ind_demands" => ans, "total_demand" => sum(ans) )
 
-######
+"""
+
+#function demand(price::Vector, '''Student::Student''', pref::SparseMatrixCSC{Int64, Int64}, Student.budget::Int64, Student.capacity::Int64, time_const::SparseMatrixCSC{Int8, Int8}, mand_cour_const::Vector, prog_cour_const, sem_cour_const, elec_cour_const, num_elec_cour, p_neigh_parm::Int64)
+function demand(price::Vector, Student::Student, p_neigh_parm::Int64)
+
+	dem = []
+
+	N = size(Student.pref)[1]
+
+	let
+		# Maximization problem
+		m = Model(solver=GurobiSolver())
+
+		@variable(m, x[1:N], Bin)
+
+		# Objective: maximize utility
+		@objective(m, Max, x'*Student.pref*x)
+
+		# Constraints:
+
+		#Should have exactly 3 classes
+		@constraint(m, sum(x) == Student.capacity)
+
+		#Should not spend more than one's budget
+		@constraint(m,  dot(price, x) <= Student.budget )
+
+		#Time Constraints
+		@constraint(m, x'*Student.time_const*x == 0 )
+
+		#Mandatory courses
+		@constraint(m, Student.mand_cour_const'*x == 0 )
+
+		#Elective courses
+		@constraint(m, Student.elec_cour_const'*x .- Student.num_elec_cour .>= 0)
+
+		#Program courses
+		@constraint(m, Student.prog_cour_const'*x .== 0 )
+
+		#Program courses
+		@constraint(m, Student.sem_cour_const'*x .== 0 )
+
+		#Neighboring prices constraint
+		if p_neigh_parm ~= 0
+			@constraint(m, x[p_neigh_parm] == 1)
+		end
+
+		# Solve problem using MIP solver
+		status = solve(m)
+		dem = getvalue(x)
+		return dem
+
+	end
+
+end
