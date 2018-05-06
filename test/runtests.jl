@@ -16,7 +16,9 @@ using Base.Test
 
     @testset "unimodal preferences 2 students" begin
 	    p = rand(3)
-	    pref = [sparse(1:3,1:3,[100;0;0]);sparse(1:3,1:3,[0;100;0])] #one class prefered
+	    pref = []
+	    push!(pref,sparse(1:3,1:3,[100;0;0]))
+	    push!(pref,sparse(1:3,1:3,[0;100;0]))
 	    budg = [100;100] #arbitrary budget
 	    req = [1;1] #1 class is required
 	    solution = CourseMatch.demand(p, pref, budg, req)
@@ -40,7 +42,9 @@ using Base.Test
     @testset "unaffordable most preferred course 2 students" begin
 	    p = rand(3)
 	    p[1] = 101  # high price on course 1
-	    pref = [sparse(1:3,1:3,[100;50;0]); sparse(1:3,1:3,[100;0;50])] #one class prefered
+	    pref = []
+	    push!(pref,sparse(1:3,1:3,[100;50;0]))
+	    push!(pref,sparse(1:3,1:3,[100;0;50]))
 	    budg = [100;100] #arbitrary budget
 	    req = [1;1] #1 class is required
 	    solution = CourseMatch.demand(p, pref, budg, req)
