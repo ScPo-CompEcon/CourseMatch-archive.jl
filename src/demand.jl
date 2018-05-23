@@ -1,5 +1,5 @@
 """
-    demand(price::Vector, Student::Student, p_neigh_parm::Int64)
+    demand(price::Vector, Student::Student, p_neigh_parm::Int64=1)
 
 Compute the total demand for classes based on the optimal individual bundles given preferences, budget and prices, and under constraints such as program, semester and time clashes using the `GurobiSolver()`.
 
@@ -14,10 +14,18 @@ Assume that N is the number of students, and C the number of classes that are av
 - `Student.capacity` : a column vector of dimension N x 1, which n-th element is the number of classes student n has to attend.
 - `Student.time_const` : a sparse array C x C that flags with 1 if the ith element HAS a clash with jth element. 0 otherwise.
 - `Student.mand_cour_const` : a vector C x 1. the i-th element is 1 if the course must be taken, 0 otherwise
-- `Student.prog_cour_const` : a vector C x 1. the i-th element is 1 if the course is NOT in the students's program. 0 otherwise.
-- `Student.sem_cour_const` : a vector C x 1. the i-th element is 1 if the course is NOT the students's semester
-- `Student.elec_cour_const` : a vector C x 1. the i-th element is 1 if the course is elective for the students
-- `Student.num_elec_cour` : number of elective courses that the student is required to take
+- `Student.tc_cour_prog_const` : a vector C x 1. the i-th element is 1 if the course is NOT in the TC of the students's program. 0 otherwise.
+- `Student.tc_cour_sem_const` : a vector C x 1. the i-th element is 1 if the course is NOT in the TC of the students's semester
+- `Student.tc_cour_const` : a vector C x 1. the i-th element is 1 if the course is part of the TC for the student
+- `Student.tc_requirement` : number of TC courses that the student is required to take
+- `Student.fc_cour_prog_const` : a vector C x 1. the i-th element is 1 if the course is NOT in the FC of the students's program. 0 otherwise.
+- `Student.fc_cour_sem_const` : a vector C x 1. the i-th element is 1 if the course is NOT in the FC of the students's semester
+- `Student.fc_cour_const` : a vector C x 1. the i-th element is 1 if the course is part of the FC for the student
+- `Student.fc_requirement` : number of FC courses that the student is required to take
+- `Student.el_cour_prog_const` : a vector C x 1. the i-th element is 1 if the course is NOT in the electives of the students's program. 0 otherwise.
+- `Student.el_cour_sem_const` : a vector C x 1. the i-th element is 1 if the course is NOT in the electives of the students's semester
+- `Student.el_cour_const` : a vector C x 1. the i-th element is 1 if the course is part of the electives choice for the student
+- `Student.el_requirement` : number of electives courses that the student is required to take
 - `p_neigh_parm` : course that needs to be dropped in order to compute neigboring prices
 
 ## Example
@@ -92,7 +100,7 @@ mkt_demand = Dict("ind_demands" => ans, "total_demand" => sum(ans) )
 """
 
 #function demand(price::Vector, '''Student::Student''', pref::SparseMatrixCSC{Int64, Int64}, Student.budget::Int64, Student.capacity::Int64, time_const::SparseMatrixCSC{Int8, Int8}, mand_cour_const::Vector, prog_cour_const, sem_cour_const, elec_cour_const, num_elec_cour, p_neigh_parm::Int64)
-function demand(price::Vector, Student::Student, p_neigh_parm::Int64)
+function demand(price::Vector, Student::Student, p_neigh_parm::Int64=0)
 
 	dem = []
 
@@ -109,9 +117,6 @@ function demand(price::Vector, Student::Student, p_neigh_parm::Int64)
 
 		# Constraints:
 
-		#Should have exactly 3 classes
-		@constraint(m, sum(x) == Student.capacity)
-
 		#Should not spend more than one's budget
 		@constraint(m,  dot(price, x) <= Student.budget )
 
@@ -121,14 +126,35 @@ function demand(price::Vector, Student::Student, p_neigh_parm::Int64)
 		#Mandatory courses
 		@constraint(m, Student.mand_cour_const'*x == 0 )
 
-		#Elective courses
-		@constraint(m, Student.elec_cour_const'*x .- Student.num_elec_cour .>= 0)
+		#Tronc commun courses
+			#TC courses
+			@constraint(m, Student.tc_cour_const'*x .- Student.tc_requirement .>= 0)
 
-		#Program courses
-		@constraint(m, Student.prog_cour_const'*x .== 0 )
+			#TC program constraint
+			@constraint(m, Student.tc_cour_prog_const'*x .== 0 )
 
-		#Program courses
-		@constraint(m, Student.sem_cour_const'*x .== 0 )
+			#TC semester constraint
+			@constraint(m, Student.tc_cour_sem_const'*x .== 0 )
+
+		#Formation commune courses
+			#FC courses
+			@constraint(m, Student.fc_cour_const'*x .- Student.fc_requirement .>= 0)
+
+			#FC program constraint
+			@constraint(m, Student.fc_cour_prog_const'*x .== 0 )
+
+			#FC semester constraint
+			@constraint(m, Student.fc_cour_sem_const'*x .== 0 )
+
+		#Electives courses
+			#TC courses
+			@constraint(m, Student.el_cour_const'*x .- Student.el_requirement .>= 0)
+
+			#TC program constraint
+			@constraint(m, Student.el_cour_prog_const'*x .== 0 )
+
+			#TC semester constraint
+			@constraint(m, Student.el_cour_sem_const'*x .== 0 )
 
 		#Neighboring prices constraint
 		if p_neigh_parm ~= 0
