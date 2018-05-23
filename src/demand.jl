@@ -1,5 +1,7 @@
 """
     demand(price::Vector, Student::Student, p_neigh_parm::Int64=1)
+	demand(price::Vector, pref::SparseMatrixCSC{Int64, Int64}, Student.budget::Float64, Student.time_const::SparseMatrixCSC{Int64, Int64}, Student.mand_cour_const::Vector, Student.tc_cour_prog_const::Vector, Student.tc_cour_sem_const::Vector, Student.tc_cour_const::Vector, Student.tc_requirement::Int16,Student.fc_cour_prog_const::Vector, Student.fc_cour_sem_const::Vector, Student.fc_cour_const::Vector, Student.fc_requirement::Int16, Student.el_cour_prog_const::Vector, Student.el_cour_sem_const::Vector, Student.el_cour_const::Vector, Student.el_requirement::Int16, p_neigh_parm::Int64=0)
+
 
 Compute the total demand for classes based on the optimal individual bundles given preferences, budget and prices, and under constraints such as program, semester and time clashes using the `GurobiSolver()`.
 
@@ -11,7 +13,6 @@ Assume that N is the number of students, and C the number of classes that are av
 - `price` : a column vector of dimension C x 1, which i-th element is the price that was assigned to class i.
 - `Student.pref` : an array containing S elements, and such that its n-th element is the (sparse) matrix representing student n preferences. Each of the matrices contained in that array should be a squared matrix of dimension C.
 - `Student.budget` : a column vector of dimension N x 1, which n-th element is the budget that was allocated to the n-th student.
-- `Student.capacity` : a column vector of dimension N x 1, which n-th element is the number of classes student n has to attend.
 - `Student.time_const` : a sparse array C x C that flags with 1 if the ith element HAS a clash with jth element. 0 otherwise.
 - `Student.mand_cour_const` : a vector C x 1. the i-th element is 1 if the course must be taken, 0 otherwise
 - `Student.tc_cour_prog_const` : a vector C x 1. the i-th element is 1 if the course is NOT in the TC of the students's program. 0 otherwise.
@@ -99,7 +100,6 @@ mkt_demand = Dict("ind_demands" => ans, "total_demand" => sum(ans) )
 
 """
 
-#function demand(price::Vector, '''Student::Student''', pref::SparseMatrixCSC{Int64, Int64}, Student.budget::Int64, Student.capacity::Int64, time_const::SparseMatrixCSC{Int8, Int8}, mand_cour_const::Vector, prog_cour_const, sem_cour_const, elec_cour_const, num_elec_cour, p_neigh_parm::Int64)
 function demand(price::Vector, Student::Student, p_neigh_parm::Int64=0)
 
 	dem = []
