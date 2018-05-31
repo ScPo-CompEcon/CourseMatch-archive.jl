@@ -4,6 +4,18 @@
 
 This is the repo for the `CourseMatch` term project of our course.
 
+## Checklist
+
+- [x] implement a `Student` struct to carry all relevant information
+- [x] implement `student`'s demand function: given prices, preferences and constraints, which is the optimal choice of courses
+- [x] test demand function
+- [x] translate pseudo code of main price search algo from paper (algo 1)
+- [ ] test pseudo code translation
+- [ ] implement algo 2: refinement of price vector
+- [x] implement neighboring price vector function
+- [ ] test neighboring price vector function
+- 
+
 ## Modus Operandi
 
 * Please **never** push anything onto the `master` branch.
