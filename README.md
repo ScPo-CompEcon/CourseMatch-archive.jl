@@ -13,8 +13,7 @@ This is the repo for the `CourseMatch` term project of our course.
 - [ ] test pseudo code translation
 - [ ] implement algo 2: refinement of price vector
 - [x] implement neighboring price vector function
-- [ ] test neighboring price vector function
-- 
+- [ ] test neighboring price vector function 
 
 ## Modus Operandi
 
