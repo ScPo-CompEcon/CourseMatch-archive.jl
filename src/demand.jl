@@ -1,8 +1,7 @@
 """
-    demand(price, pref, budget, capacity)
-    demand(price, s::Student)
+    demand(price, s::Student;p_neigh_parm::Int64=0)
 
-Compute the total demand for classes based on the optimal individual bundles given preferences, budget and prices, using the `GurobiSolver()`.
+Compute the total demand for classes based on the optimal individual bundles for a `student`.
 
 
 ## Arguments
@@ -10,9 +9,7 @@ Compute the total demand for classes based on the optimal individual bundles giv
 Assume that N is the number of students, and C the number of classes that are available to choose from.
 
 - `price` : a column vector of dimension C x 1, which i-th element is the price that was assigned to class i.
-- `pref` : an array containing S elements, and such that its n-th element is the (sparse) matrix representing student n preferences. Each of the matrices contained in that array should be a squared matrix of dimension C.
-- `budget` : a column vector of dimension N x 1, which n-th element is the budget that was allocated to the n-th student.
-- `capacity` : a column vector of dimension N x 1, which n-th element is the number of classes student n has to attend.
+- `student`: instance of type `Student`
 
 ## Example
 
@@ -112,44 +109,88 @@ julia> d[:ind_demands]
 ```
 
 """
-function demand(price, pref, budget, capacity)
+function demand(price::Vector{Float64}, s::Student; p_neigh_parm::Int64=0)
 
+	N = size(s.pref)[1]  # number of choices
 
-	M = length(pref)
-    N = size(pref[1],2)  # imposed that all have the same number of preferences.
-    demand = zeros(Int,M,N)
+	# Maximization problem
+	m = Model(solver=GurobiSolver())
 
-	for i in 1:M
+	@variable(m, x[1:N], Bin)
 
-		let
-			# Maximization problem
-			m = Model(solver=GurobiSolver())
+	# Objective: maximize utility
+	@objective(m, Max, x'*s.pref*x)
 
-			@variable(m, x[1:N], Bin)
+	# Constraints:
 
-			# Objective: maximize utility
-			@objective(m, Max, x'*pref[i]*x)
+	#Should not spend more than one's budget
+	@constraint(m,  dot(price, x) <= s.budget )
 
-			# Constraints:
+	#Time Constraints
+	@constraint(m, x'*s.time_const*x == 0 )
 
-			#Should have exactly 3 classes
-			@constraint(m, sum(x) == capacity[i])
+	#Mandatory courses
+	@constraint(m, s.mand_cour_const'*x == 0 )
 
-			#Should not spend more than one's budget
-			@constraint(m,  dot(price, x) <= budget[i])
+	#Tronc commun courses
+	#TC courses
+	@constraint(m, s.tc_cour_const'*x .- s.tc_requirement .>= 0)
 
-			# Solve problem using MIP solver
-			status = solve(m)
-            demand[i,:] = getvalue(x)
-		end
+	#TC program constraint
+	@constraint(m, s.tc_cour_prog_const'*x .== 0 )
 
+	#TC semester constraint
+	@constraint(m, s.tc_cour_sem_const'*x .== 0 )
+
+	#Formation commune courses
+	#FC courses
+	@constraint(m, s.fc_cour_const'*x .- s.fc_requirement .>= 0)
+
+	#FC program constraint
+	@constraint(m, s.fc_cour_prog_const'*x .== 0 )
+
+	#FC semester constraint
+	@constraint(m, s.fc_cour_sem_const'*x .== 0 )
+
+	#Electives courses
+	#TC courses
+	@constraint(m, s.el_cour_const'*x .- s.el_requirement .>= 0)
+
+	#TC program constraint
+	@constraint(m, s.el_cour_prog_const'*x .== 0 )
+
+	#TC semester constraint
+	@constraint(m, s.el_cour_sem_const'*x .== 0 )
+
+	#Neighboring prices constraint
+	# require that course id p_neigh_parm must be chosen
+	if p_neigh_parm ~= 0
+		@constraint(m, x[p_neigh_parm] == 1)
 	end
 
-  # add clearing error
-  # err = clearing_error(sum(demand,1),chairs,price)
+	# Solve problem using MIP solver
+	status = solve(m)
+	dem = getvalue(x)
+
+	return dem
+end
+
+"""
+	demand for all students
+"""
+function demand(price::Vector{Float64}, s::Array{Student})
 
 
-  return Dict(:ind_demands => demand,:course_demand => sum(demand,1),:total=>sum(demand) )
+	N = size(s[1].pref)[1]
+	M = length(s)
+    outdem = zeros(Int,M,N)
+
+	for (i,stu) in enumerate(s)
+		outdem[i,:] = demand(price,stu)
+	end
+
+  	return Dict(:ind_demands => out_dem,:course_demand => sum(out_dem,1),:total=>sum(out_dem) )
 	# return Dict(:ind_demands => demand,:course_demand => sum(demand,1),:total=>sum(demand),:clearing_error=>err )
 
 end
+
