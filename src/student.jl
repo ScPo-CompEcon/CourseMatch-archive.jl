@@ -55,24 +55,99 @@ function timecons(data)
     return d
 end
 
+"""
+# constraints 
 
+* `time`: a sparse matrix C x C that flags with 1 if the ith element HAS a clash with jth element. 0 otherwise.
+* `mandatory`: a vector C x 1. the i-th element is 1 if the course must be taken, 0 otherwise
+* `notTCprogram`: a vector C x 1. the i-th element is 1 if the course is NOT in the TC of the students's program
+* `notTCsemester`: a vector C x 1. the i-th element is 1 if the course is NOT in the TC of the students's semester
+* `isTC`: a vector C x 1. the i-th element is 1 if the course IS in the TC of the students
+* `notFCprogram`: a vector C x 1. the i-th element is 1 if the course is NOT in the FC of the students's program
+* `notFCsemester`: a vector C x 1. the i-th element is 1 if the course is NOT in the FC of the students's semester
+* `isFC`: a vector C x 1. the i-th element is 1 if the course IS in the FC of the students
+* `notELprogram`: a vector C x 1. the i-th element is 1 if the course is NOT in the EL (electives) of the students's program
+* `notELsemester`: a vector C x 1. the i-th element is 1 if the course is NOT in the EL of the students's semester
+* `isEL`: a vector C x 1. the i-th element is 1 if the course IS in the EL of the students
+
+"""
+struct Constraints
+    clash         :: SparseMatrixCSC{Int,Int}
+    mandatory     :: Vector{Bool}
+    notTCprogram  :: Vector{Bool}
+    notTCsemester :: Vector{Bool}
+    isTC          :: Vector{Bool}
+    notFCprogram  :: Vector{Bool}
+    notFCsemester :: Vector{Bool}
+    isFC          :: Vector{Bool}
+    notELprogram  :: Vector{Bool}
+    notELsemester :: Vector{Bool}
+    isEL          :: Vector{Bool}
+end
+
+"random constraints"
+function rand_constraints(N)
+    if N<2
+        error("N must be > 2")
+    end
+    clash = sparse(collect(1:2),collect(1:2),ones(Int,2),N,N)
+    mandatory = rand([true false],N)
+    notTCprogram = rand([true false false false false false],N)
+    notTCsemester = rand([true false false false false false],N)
+    isTC = rand([true false],N)
+    notFCprogram = rand([true false false false false false],N)
+    notFCsemester = rand([true false false false false false],N)
+    isFC = rand([true false],N)
+    notELprogram = rand([true false false false false false],N)
+    notELsemester = rand([true false false false false false],N)
+    isEL = rand([true false],N)
+    return Constraints(clash,mandatory,notTCprogram,notTCsemester,isTC,notFCprogram,notFCsemester,isFC,notELprogram,notELsemester,isEL)
+end
 
 
 """
-# `Student` struct
+# Student
 
+## Fields
+
+- `price` : a column vector of dimension C x 1, which i-th element is the price that was assigned to class i.
+- `preferences` : an array containing S elements, and such that its n-th element is the (sparse) matrix representing student n preferences. Each of the matrices contained in that array should be a squared matrix of dimension C.
+- `budget` : a column vector of dimension N x 1, which n-th element is the budget that was allocated to the n-th student.
+- `constraints`: an instance of a [`Constraints`](@ref)
+- `req_TC` : number of TC courses that the student is required to take
+- `req_FC` : number of FC courses that the student is required to take
+- `req_EL` : number of EL courses that the student is required to take
 """
 mutable struct Student
-    pref :: SparseMatrixCSC{Int64, Int64}
+    preferences :: SparseMatrixCSC{Int64, Int64}
     program :: String
     year :: Int64
-    time_const :: SparseMatrixCSC{Int64,Int64}
-    #prog_constr :: Matrix
+    constraints :: Constraints
     req_FC :: Int64
     req_TC :: Int64
-    req_OP :: Int64
+    req_EL :: Int64
     budget :: Float64
     allocation :: Array{Int64,1}
+
+    function Student(N=10;preferences=spzeros(N,N),
+                     program="MIE",
+                     year::Int=1,
+                     constraints=Constraints(N),
+                     req_FC::Int=1,
+                     req_TC::Int=2,
+                     req_EL::Int=1,
+                     budget = rand()*100)
+        new(
+            preferences,
+            program,
+            year,
+            constraints,
+            req_FC,
+            req_TC,
+            req_EL,
+            budget,
+            zeros(N))
+    end
 end
 
 
