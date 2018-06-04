@@ -39,17 +39,18 @@ For instance "L1" stands for the first slot on Monday, and "R5" for the fifth sl
 function timecons(data)
 
     d = Dict()
-    programs = unique(data[:program])
+    programs = unique(data[:Program])
 
-    for p in programs
-        df = data[findin(data[:program],[p]),:]
-        P = fill(0, nrow(df), nrow(df))
-        for i in 1:(length(df)-1)
-            if df[:slot][i] == df[:slot][i+1]
+    for p in programs, s in 1:2
+        df = data[findin(data[:Program],[p]),:]
+        df1 = df[findin(df[:ClassS], [s, 12]),:]
+        P = fill(0, nrow(df1), nrow(df1))
+        for i in 1:(length(df1)-1)
+            if df1[:slot][i] == df1[:slot][i+1]
                 P[i, i+1] = 1
             end
         end
-        d[p] = sparse(P)
+        d["$p$s"] = sparse(P)
     end
     return d
 end
@@ -62,10 +63,15 @@ end
 
 """
 mutable struct Student
+    pref :: SparseMatrixCSC{Int64, Int64}
     program :: String
     year :: Int64
-    time_constr :: SparseMatrixCSC{Int64,Int64}
+    time_const :: SparseMatrixCSC{Int64,Int64}
     #prog_constr :: Matrix
+    req_FC :: Int64
+    req_TC :: Int64
+    req_OP :: Int64
+    budget :: Float64
     allocation :: Array{Int64,1}
 end
 
@@ -103,11 +109,15 @@ function read_students()
     d = Dict{Int,Student}()
     for i in 1:nrow(data)
         s = data[:ID][i]
-        p = data[:Program][i]
-        d[s] = Student(p,
-                    data[:Year][i],
+        d[s] = Student(sparse(collect(1:10), collect(1:10), rand(0:100, 10)),
+                    data[:ProgSem][i],
+                    data[:ProgSem][i][end],
                     dictp[p],
                     #progcons,
+                    1,
+                    rand(1:2),
+                    3,
+                    150+rand(),
                     fill(0, size(dictp[p])[1])
                     )
     end
